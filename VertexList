@@ -1,0 +1,130 @@
+package assignments;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+
+/* Name: Christian Garo 
+ * Email: christian.garo@sjsu.edu
+ * ID: 015083900
+*/
+
+public class VertexList {
+	ArrayList<LinkedList<VertexNode>> adjacencyList;
+
+	public VertexList() {
+		adjacencyList = new ArrayList<>(); // default size for adjacency list, will increase when adding more vertices
+		// for (int i = 0; i < 10; i++) {
+		// adjacencyList.add(new LinkedList<>()); // adds linked lists to the adjacency
+		// list
+		// }
+		adjacencyList.add(new LinkedList<>()); // adds one linked list to ensure that there is a linked list in the
+												// adjacency list
+	}
+
+	public class VertexNode {
+		Vertex vertex;
+		VertexNode nextVertex;
+
+		public VertexNode(Vertex vertex) {
+			this.vertex = vertex;
+			this.nextVertex = null;
+		}
+	}
+
+	public Vertex findOrMake(int i) {
+		checkCapacity(i); //call to check the capacity of the adjacency list. increase it when adding a new vertex
+		// first for-each loop loops through vertex lists in the adjacency list
+		// second for-each loop loops through the nodes in the vertexList
+		for (LinkedList<VertexNode> vertexList : adjacencyList) { // loops through the vertex lists in the adjacency
+																	// list
+			for (VertexNode node : vertexList) { // loops through the nodes in the vertex list
+				if (node.vertex.getId() == i) {
+					return node.vertex; // return existing vertex
+				}
+			}
+		}
+
+		// creates a new vertex with id = i if the vertex is not in the adjacency list.
+		Vertex newVertex = new Vertex(i);
+		int vertexIndex = i % adjacencyList.size(); // dividing the id by the size of the adjacency list to determine
+													// where the vertex goes
+		adjacencyList.get(vertexIndex).add(new VertexNode(newVertex)); // adds vertex node at index of adjacency list
+
+		return newVertex;
+	}
+
+	private void checkCapacity(int idNumber){
+		// dynamically resize adjacency list size for ID numbers larger than the
+		// adjacency list size
+		int listSize = adjacencyList.size();
+
+		if (idNumber >= listSize) {
+			while (listSize <= idNumber) {
+				adjacencyList.add(new LinkedList<>());
+				listSize++;
+			}
+		}
+	}
+
+	// method for addEdge; to be used in Graph class
+	public void addVertex(Vertex vertex) {
+		int vertexIndex = vertex.getId() % adjacencyList.size(); // determine the index in the adjacency list
+		LinkedList<VertexNode> vertexList = adjacencyList.get(vertexIndex);
+
+		if(inList(vertex, vertexList)){
+			return;
+		}
+
+		// add the new VertexNode to the appropriate position in the list
+		vertexList.add(new VertexNode(vertex));
+	}
+
+	private boolean inList(Vertex vertex, LinkedList<VertexNode> list){
+		// check if the vertex already exists in the list
+		for (VertexNode node : list) {
+			if (node.vertex.getId() == vertex.getId()) {
+				return true; // vertex already in the list, no need to add it again
+			}
+		}
+		return false;
+	}
+
+	// get size of the VertexList
+	public int size() {
+		int count = 0;
+		for (LinkedList<VertexNode> vertexList : adjacencyList) {
+			count += vertexList.size();
+		}
+		return count;
+	}
+
+	// checks adjacency list by printing it out
+	public void printAdjacencyList() {
+		for (LinkedList<VertexNode> vertexList : adjacencyList) {
+			if (vertexList.isEmpty()) {
+				continue;
+			}
+			System.out.print("Adjacency List: ");
+			for (VertexNode vertexNode : vertexList) {
+				Vertex vertex = vertexNode.vertex;
+				System.out.print(vertex.getId() + " -> ");
+			}
+			System.out.println("null");
+		}
+	}
+
+	// toString method to display outgoing edges that represent the adjacency list
+	// (could not figure out printAdjacencyList method)
+	@Override
+	public String toString() {
+		StringBuilder string = new StringBuilder();
+		for (LinkedList<VertexNode> vertexList : adjacencyList) {
+			string.append("[ ");
+			for (VertexNode node : vertexList) {
+				string.append(node.vertex.getId()).append("->");
+			}
+			string.append("] ");
+		}
+		return string.toString();
+	}
+}
